@@ -79,12 +79,61 @@ export default function SettingsScreen() {
     console.log(`Notification ${key} toggled`);
   };
 
+  const handleLogout = () => {
+    console.log('Logout requested');
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout? You will need to rejoin your office or create a new one.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            console.log('User logged out');
+            // In a real app, you would clear AsyncStorage or similar
+            router.replace('/');
+          }
+        }
+      ]
+    );
+  };
+
+  const handleLeaveOffice = () => {
+    console.log('Leave office requested');
+    Alert.alert(
+      'Leave Office',
+      'Are you sure you want to leave this office? You will lose access to all office data and will need to be re-invited to rejoin.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Leave Office',
+          style: 'destructive',
+          onPress: () => {
+            console.log('User left office');
+            Alert.alert(
+              'Left Office',
+              'You have successfully left the office. You can now create a new office or join another one.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => router.replace('/')
+                }
+              ]
+            );
+          }
+        }
+      ]
+    );
+  };
+
   const renderSettingItem = (
     title: string,
     subtitle: string,
     icon: string,
     onPress: () => void,
-    rightElement?: React.ReactNode
+    rightElement?: React.ReactNode,
+    isDestructive?: boolean
   ) => (
     <TouchableOpacity
       style={[commonStyles.card, { marginBottom: 12 }]}
@@ -93,9 +142,21 @@ export default function SettingsScreen() {
     >
       <View style={[commonStyles.spaceBetween]}>
         <View style={[commonStyles.row, { flex: 1 }]}>
-          <Icon name={icon as any} size={24} color={colors.primary} style={{ marginRight: 16 }} />
+          <Icon 
+            name={icon as any} 
+            size={24} 
+            color={isDestructive ? colors.error : colors.primary} 
+            style={{ marginRight: 16 }} 
+          />
           <View style={{ flex: 1 }}>
-            <Text style={[commonStyles.text, { fontWeight: '600', marginBottom: 4 }]}>
+            <Text style={[
+              commonStyles.text, 
+              { 
+                fontWeight: '600', 
+                marginBottom: 4,
+                color: isDestructive ? colors.error : colors.text
+              }
+            ]}>
               {title}
             </Text>
             <Text style={commonStyles.textSecondary}>
@@ -334,6 +395,29 @@ export default function SettingsScreen() {
                 [{ text: 'OK' }]
               );
             }
+          )}
+
+          {/* Account Actions */}
+          <Text style={[commonStyles.subtitle, { fontSize: 18, marginTop: 32, marginBottom: 16 }]}>
+            Account Actions
+          </Text>
+
+          {renderSettingItem(
+            'Leave Office',
+            'Leave this office and lose access to all data',
+            'exit',
+            handleLeaveOffice,
+            undefined,
+            true
+          )}
+
+          {renderSettingItem(
+            'Logout',
+            'Sign out of your account',
+            'log-out',
+            handleLogout,
+            undefined,
+            true
           )}
 
           <View style={{ height: 40 }} />

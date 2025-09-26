@@ -97,12 +97,7 @@ export default function DashboardScreen() {
       ]}
       onPress={() => {
         console.log(`Navigate to ${card.route}`);
-        if (card.route === '/staff' || card.route === '/messages' || card.route === '/reports') {
-          // These screens don't exist yet, show alert
-          console.log(`${card.title} feature coming soon`);
-        } else {
-          router.push(card.route as any);
-        }
+        router.push(card.route as any);
       }}
       activeOpacity={0.7}
     >
@@ -134,7 +129,8 @@ export default function DashboardScreen() {
             </View>
             <TouchableOpacity
               onPress={() => {
-                console.log('Settings pressed - feature coming soon');
+                console.log('Navigate to settings');
+                router.push('/settings');
               }}
             >
               <Icon name="settings" size={24} color={colors.text} />
