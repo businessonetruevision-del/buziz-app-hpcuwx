@@ -28,24 +28,33 @@ export default function DashboardScreen() {
     memberCount: 8
   });
 
+  const [todayStats] = useState({
+    activeShifts: 6,
+    openTasks: 12,
+    alerts: 2,
+    completedTasks: 8,
+    hoursWorked: 45,
+    lowStockItems: 3
+  });
+
   const dashboardCards: DashboardCard[] = [
     {
       title: 'Shifts',
-      subtitle: '3 upcoming this week',
+      subtitle: `${todayStats.activeShifts} active today`,
       icon: 'calendar',
       route: '/shifts',
       color: colors.primary
     },
     {
       title: 'Tasks',
-      subtitle: '5 pending assignments',
+      subtitle: `${todayStats.openTasks} pending`,
       icon: 'checkmark-circle',
       route: '/tasks',
       color: colors.accent
     },
     {
       title: 'Inventory',
-      subtitle: '2 low stock alerts',
+      subtitle: `${todayStats.lowStockItems} low stock alerts`,
       icon: 'cube',
       route: '/inventory',
       color: colors.warning
@@ -88,7 +97,12 @@ export default function DashboardScreen() {
       ]}
       onPress={() => {
         console.log(`Navigate to ${card.route}`);
-        router.push(card.route as any);
+        if (card.route === '/staff' || card.route === '/messages' || card.route === '/reports') {
+          // These screens don't exist yet, show alert
+          console.log(`${card.title} feature coming soon`);
+        } else {
+          router.push(card.route as any);
+        }
       }}
       activeOpacity={0.7}
     >
@@ -113,15 +127,14 @@ export default function DashboardScreen() {
           {/* Header */}
           <View style={[commonStyles.spaceBetween, { marginBottom: 24 }]}>
             <View>
-              <Text style={commonStyles.title}>Welcome back!</Text>
+              <Text style={commonStyles.title}>Buziz Dashboard</Text>
               <Text style={commonStyles.textSecondary}>
                 {currentUser.name} • {currentUser.employeeNumber}
               </Text>
             </View>
             <TouchableOpacity
               onPress={() => {
-                console.log('Navigate to settings');
-                router.push('/settings' as any);
+                console.log('Settings pressed - feature coming soon');
               }}
             >
               <Icon name="settings" size={24} color={colors.text} />
@@ -155,29 +168,54 @@ export default function DashboardScreen() {
             </Text>
             <View style={[commonStyles.row, { justifyContent: 'space-around' }]}>
               <View style={{ alignItems: 'center' }}>
-                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700' }]}>
-                  6
+                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700', color: colors.success }]}>
+                  {todayStats.activeShifts}
                 </Text>
                 <Text style={commonStyles.textSecondary}>
                   Active Shifts
                 </Text>
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700' }]}>
-                  12
+                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700', color: colors.warning }]}>
+                  {todayStats.openTasks}
                 </Text>
                 <Text style={commonStyles.textSecondary}>
                   Open Tasks
                 </Text>
               </View>
               <View style={{ alignItems: 'center' }}>
-                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700' }]}>
-                  2
+                <Text style={[commonStyles.text, { fontSize: 24, fontWeight: '700', color: colors.error }]}>
+                  {todayStats.alerts}
                 </Text>
                 <Text style={commonStyles.textSecondary}>
                   Alerts
                 </Text>
               </View>
+            </View>
+          </View>
+
+          {/* Performance Summary */}
+          <View style={[commonStyles.card, { marginBottom: 24 }]}>
+            <Text style={[commonStyles.subtitle, { fontSize: 16, marginBottom: 16 }]}>
+              This Week&apos;s Performance
+            </Text>
+            <View style={[commonStyles.row, { justifyContent: 'space-between', marginBottom: 12 }]}>
+              <Text style={commonStyles.textSecondary}>Tasks Completed</Text>
+              <Text style={[commonStyles.text, { fontWeight: '600' }]}>
+                {todayStats.completedTasks}/{todayStats.completedTasks + todayStats.openTasks}
+              </Text>
+            </View>
+            <View style={[commonStyles.row, { justifyContent: 'space-between', marginBottom: 12 }]}>
+              <Text style={commonStyles.textSecondary}>Hours Worked</Text>
+              <Text style={[commonStyles.text, { fontWeight: '600' }]}>
+                {todayStats.hoursWorked}h
+              </Text>
+            </View>
+            <View style={[commonStyles.row, { justifyContent: 'space-between' }]}>
+              <Text style={commonStyles.textSecondary}>Inventory Status</Text>
+              <Text style={[commonStyles.text, { fontWeight: '600', color: todayStats.lowStockItems > 0 ? colors.warning : colors.success }]}>
+                {todayStats.lowStockItems > 0 ? `${todayStats.lowStockItems} Low Stock` : 'All Good'}
+              </Text>
             </View>
           </View>
 
@@ -192,6 +230,42 @@ export default function DashboardScreen() {
             marginBottom: 40
           }}>
             {dashboardCards.map(renderDashboardCard)}
+          </View>
+
+          {/* Recent Activity */}
+          <View style={[commonStyles.card, { marginBottom: 40 }]}>
+            <Text style={[commonStyles.subtitle, { fontSize: 16, marginBottom: 16 }]}>
+              Recent Activity
+            </Text>
+            <View style={{ marginBottom: 12 }}>
+              <View style={[commonStyles.row, { marginBottom: 8 }]}>
+                <Icon name="checkmark-circle" size={16} color={colors.success} />
+                <Text style={[commonStyles.textSecondary, { marginLeft: 8, flex: 1 }]}>
+                  Task &quot;Update inventory&quot; completed by Sarah
+                </Text>
+                <Text style={[commonStyles.textSecondary, { fontSize: 12 }]}>
+                  2h ago
+                </Text>
+              </View>
+              <View style={[commonStyles.row, { marginBottom: 8 }]}>
+                <Icon name="calendar" size={16} color={colors.primary} />
+                <Text style={[commonStyles.textSecondary, { marginLeft: 8, flex: 1 }]}>
+                  New shift assigned to Mike for tomorrow
+                </Text>
+                <Text style={[commonStyles.textSecondary, { fontSize: 12 }]}>
+                  4h ago
+                </Text>
+              </View>
+              <View style={[commonStyles.row]}>
+                <Icon name="warning" size={16} color={colors.warning} />
+                <Text style={[commonStyles.textSecondary, { marginLeft: 8, flex: 1 }]}>
+                  Low stock alert: Office supplies running low
+                </Text>
+                <Text style={[commonStyles.textSecondary, { fontSize: 12 }]}>
+                  6h ago
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
