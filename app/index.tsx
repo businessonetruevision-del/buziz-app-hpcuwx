@@ -1,52 +1,114 @@
-import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
-import { commonStyles, colors } from '../styles/commonStyles';
+
+import React, { useState, useEffect } from 'react';
+import { Text, View, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SimpleBottomSheet from '../components/BottomSheet';
+import { router } from 'expo-router';
+import { commonStyles, colors } from '../styles/commonStyles';
+import Button from '../components/Button';
 
+interface User {
+  id: string;
+  name: string;
+  employeeNumber: string;
+  role: string;
+  isCreator: boolean;
+  isHeadManager: boolean;
+}
 
-export default function MainScreen() {
-  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+interface Office {
+  id: string;
+  name: string;
+  code: string;
+  creator: string;
+  members: User[];
+}
 
-  const handleOpenBottomSheet = () => {
-    setIsBottomSheetVisible(true);
-  };
+export default function WelcomeScreen() {
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentOffice, setCurrentOffice] = useState<Office | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate checking for existing session
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+
+  // If user is logged in and has an office, redirect to dashboard
+  if (currentUser && currentOffice) {
+    router.replace('/dashboard');
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={commonStyles.container}>
+        <View style={commonStyles.centerContent}>
+          <Text style={commonStyles.title}>Buziz</Text>
+          <Text style={commonStyles.textSecondary}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-      <SafeAreaView style={commonStyles.container}>
-        <View style={commonStyles.content}>
-          <Image
-            source={require('../assets/images/final_quest_240x240.png')}
-            style={{ width: 180, height: 180 }}
-            resizeMode="contain"
-          />
-          <Text style={commonStyles.title}>This is a placeholder app.</Text>
-          <Text style={commonStyles.text}>Your app will be displayed here when it's ready.</Text>
-
-          <TouchableOpacity
-            style={{
-              backgroundColor: colors.primary,
-              paddingHorizontal: 24,
-              paddingVertical: 12,
-              borderRadius: 8,
-              marginTop: 30,
-            }}
-            onPress={handleOpenBottomSheet}
-          >
-            <Text style={{
-              color: colors.text,
-              fontSize: 16,
-              fontWeight: '600',
-            }}>
-              Open Bottom Sheet
-            </Text>
-          </TouchableOpacity>
+    <SafeAreaView style={commonStyles.container}>
+      <ScrollView contentContainerStyle={commonStyles.centerContent}>
+        <View style={{ alignItems: 'center', marginBottom: 60 }}>
+          <Text style={[commonStyles.title, { fontSize: 48, marginBottom: 16 }]}>
+            Buziz
+          </Text>
+          <Text style={[commonStyles.textSecondary, { textAlign: 'center', fontSize: 18 }]}>
+            Lightweight Business Control Panel
+          </Text>
+          <Text style={[commonStyles.textSecondary, { textAlign: 'center', marginTop: 8 }]}>
+            Manage shifts, tasks, inventory & more
+          </Text>
         </View>
 
-        <SimpleBottomSheet
-          isVisible={isBottomSheetVisible}
-          onClose={() => setIsBottomSheetVisible(false)}
-        />
-      </SafeAreaView>
+        <View style={{ width: '100%', maxWidth: 300 }}>
+          <Button
+            text="Create New Office"
+            onPress={() => {
+              console.log('Navigate to create office');
+              router.push('/create-office');
+            }}
+            style={{ marginBottom: 16 }}
+          />
+          
+          <Button
+            text="Join Existing Office"
+            onPress={() => {
+              console.log('Navigate to join office');
+              router.push('/join-office');
+            }}
+            style={{ marginBottom: 32 }}
+            variant="secondary"
+          />
+        </View>
+
+        <View style={commonStyles.card}>
+          <Text style={[commonStyles.subtitle, { fontSize: 16, marginBottom: 12 }]}>
+            Features Include:
+          </Text>
+          <Text style={[commonStyles.textSecondary, { marginBottom: 8 }]}>
+            • Shift scheduling & management
+          </Text>
+          <Text style={[commonStyles.textSecondary, { marginBottom: 8 }]}>
+            • Task assignment & tracking
+          </Text>
+          <Text style={[commonStyles.textSecondary, { marginBottom: 8 }]}>
+            • Inventory & supplier management
+          </Text>
+          <Text style={[commonStyles.textSecondary, { marginBottom: 8 }]}>
+            • Staff directory & roles
+          </Text>
+          <Text style={commonStyles.textSecondary}>
+            • Internal communication
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
